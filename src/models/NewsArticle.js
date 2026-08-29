@@ -8,7 +8,6 @@ const newsArticleSchema = new mongoose.Schema(
       required: true,
     },
 
-    // GNews article ID
     articleId: {
       type: String,
       required: true,
@@ -49,7 +48,6 @@ const newsArticleSchema = new mongoose.Schema(
       default: {},
     },
 
-    // Permanent user state
     isRead: {
       type: Boolean,
       default: false,
@@ -65,8 +63,6 @@ const newsArticleSchema = new mongoose.Schema(
   },
 );
 
-// Same user cannot have duplicate
-// records for the same article
 newsArticleSchema.index(
   {
     userId: 1,

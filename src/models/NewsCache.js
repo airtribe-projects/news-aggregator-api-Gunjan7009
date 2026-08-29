@@ -28,7 +28,6 @@ const newsCacheSchema = new mongoose.Schema(
   },
 );
 
-// One cache per user
 newsCacheSchema.index(
   {
     userId: 1,

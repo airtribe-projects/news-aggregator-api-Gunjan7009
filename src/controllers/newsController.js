@@ -94,8 +94,26 @@ exports.markAsRead = async (req, res) => {
       });
     }
 
+    const cache = await NewsCache.findOne({
+      userId: userId,
+    });
+
+    if (cache) {
+      const cachedArticle = cache.articles.find(
+        (item) => item.id === articleId,
+      );
+
+      if (cachedArticle) {
+        cachedArticle.isRead = true;
+
+        await cache.save();
+      }
+    }
+
+
     return res.status(200).json({
       message: "Article marked as read",
+
       article: {
         articleId: article.articleId,
         isRead: article.isRead,
@@ -136,8 +154,25 @@ exports.markAsFavorite = async (req, res) => {
       });
     }
 
+    const cache = await NewsCache.findOne({
+      userId: userId,
+    });
+
+    if (cache) {
+      const cachedArticle = cache.articles.find(
+        (item) => item.id === articleId,
+      );
+
+      if (cachedArticle) {
+        cachedArticle.isFavorite = true;
+
+        await cache.save();
+      }
+    }
+
     return res.status(200).json({
       message: "Article marked as favorite",
+
       article: {
         articleId: article.articleId,
         isRead: article.isRead,

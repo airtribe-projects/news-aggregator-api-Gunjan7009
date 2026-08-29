@@ -1,6 +1,5 @@
 const express = require("express");
 const { randomBytes } = require("crypto");
-// const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 const User = require("../models/User")
@@ -40,7 +39,6 @@ exports.signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = {
-            // id: new mongoose.Types.ObjectId(),
             businessId: randomBytes(6).toString("base64url"),
             name,
             email,

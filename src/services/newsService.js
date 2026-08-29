@@ -3,23 +3,11 @@ const axios = require("axios");
 const NewsCache = require("../models/NewsCache");
 const NewsArticle = require("../models/NewsArticle");
 
-// ======================================================
-// GET NEWS
-// ======================================================
-
 exports.getNewsFromAPI = async (userId, preferences) => {
   try {
-    // ==================================================
-    // 1. Find user's cache
-    // ==================================================
-
     const existingCache = await NewsCache.findOne({
       userId: userId,
     });
-
-    // ==================================================
-    // 2. Check whether cache matches current preferences
-    // ==================================================
 
     let cachePreferencesMatch = false;
 
@@ -32,14 +20,6 @@ exports.getNewsFromAPI = async (userId, preferences) => {
         JSON.stringify(oldPreferences) === JSON.stringify(newPreferences);
     }
 
-    // ==================================================
-    // 3. Return cache if:
-    //
-    //    - cache exists
-    //    - preferences are same
-    //    - cache hasn't expired
-    // ==================================================
-
     if (
       existingCache &&
       cachePreferencesMatch &&
@@ -50,23 +30,12 @@ exports.getNewsFromAPI = async (userId, preferences) => {
       return await addUserStatus(userId, existingCache.articles);
     }
 
-    // ==================================================
-    // 4. Cache missing / expired / preferences changed
-    // ==================================================
-
     console.log("Cache expired, missing, or preferences changed.");
 
     console.log("Fetching fresh news from GNews...");
 
-    // ==================================================
-    // 5. Create GNews search query
-    // ==================================================
 
     const query = preferences.join(" OR ");
-
-    // ==================================================
-    // 6. Call GNews API
-    // ==================================================
 
     const response = await axios.get("https://gnews.io/api/v4/search", {
       params: {
@@ -83,15 +52,6 @@ exports.getNewsFromAPI = async (userId, preferences) => {
     });
 
     const articles = response.data.articles || [];
-
-    // ==================================================
-    // 7. Save articles permanently
-    //
-    //    This is NOT the cache.
-    //
-    //    This stores read/favorite status.
-    // ==================================================
-
     for (const article of articles) {
       if (!article.id) {
         continue;
@@ -100,9 +60,6 @@ exports.getNewsFromAPI = async (userId, preferences) => {
       await NewsArticle.findOneAndUpdate(
         {
           userId: userId,
-
-          // IMPORTANT:
-          // Use GNews article ID
           articleId: article.id,
         },
 
@@ -125,14 +82,6 @@ exports.getNewsFromAPI = async (userId, preferences) => {
             source: article.source || {},
           },
 
-          // These values are ONLY applied
-          // when the article is first created.
-          //
-          // If the article already exists and
-          // isRead=true, it stays true.
-          //
-          // If isFavorite=true, it stays true.
-
           $setOnInsert: {
             isRead: false,
 
@@ -146,15 +95,7 @@ exports.getNewsFromAPI = async (userId, preferences) => {
       );
     }
 
-    // ==================================================
-    // 8. Cache expiry = 30 minutes
-    // ==================================================
-
     const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
-
-    // ==================================================
-    // 9. Update existing cache
-    // ==================================================
 
     if (existingCache) {
       existingCache.preferences = preferences;
@@ -166,9 +107,6 @@ exports.getNewsFromAPI = async (userId, preferences) => {
       await existingCache.save();
     }
 
-    // ==================================================
-    // 10. Create new cache
-    // ==================================================
     else {
       await NewsCache.create({
         userId: userId,
@@ -180,10 +118,6 @@ exports.getNewsFromAPI = async (userId, preferences) => {
         expiresAt: expiresAt,
       });
     }
-
-    // ==================================================
-    // 11. Add read/favorite status
-    // ==================================================
 
     return await addUserStatus(userId, articles);
   } catch (error) {
@@ -224,10 +158,6 @@ exports.searchNews = async (keyword) => {
 };
 
 
-// ======================================================
-// ADD USER READ/FAVORITE STATUS
-// ======================================================
-
 const addUserStatus = async (userId, articles) => {
   const articlesWithStatus = [];
 
@@ -238,11 +168,11 @@ const addUserStatus = async (userId, articles) => {
 
     const savedArticle = await NewsArticle.findOne({
       userId: userId,
-
       articleId: article.id,
     });
 
     articlesWithStatus.push({
+  
       ...article,
 
       isRead: savedArticle ? savedArticle.isRead : false,

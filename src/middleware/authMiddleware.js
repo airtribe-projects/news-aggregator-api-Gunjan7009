@@ -11,7 +11,6 @@ const authenticateToken = (req, res, next) => {
     });
   }
   const token = authHeader.split(" ")[1];
-  // console.log("Token:", token);
 
   if (!token) {
     return res.status(401).json({
@@ -21,7 +20,6 @@ const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    // console.log("Decoded Token:", decoded);
     req.user = decoded;
 
     next();

@@ -47,6 +47,7 @@ exports.getNewsById = async (req, res) => {
 
     const article = await NewsArticle.findOne({
       userId: userId,
+      articleId: articleId,
     });
 
     if (!article) {

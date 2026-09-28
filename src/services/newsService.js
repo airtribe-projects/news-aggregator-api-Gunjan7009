@@ -159,28 +159,33 @@ exports.searchNews = async (keyword) => {
 
 
 const addUserStatus = async (userId, articles) => {
-  const articlesWithStatus = [];
+  const articleIds = articles
+    .filter((article) => article.id)
+    .map((article) => article.id);
 
-  for (const article of articles) {
-    if (!article.id) {
-      continue;
-    }
+  const savedArticles = await NewsArticle.find({
+    userId,
+    articleId: { $in: articleIds },
+  });
 
-    const savedArticle = await NewsArticle.findOne({
-      userId: userId,
-      articleId: article.id,
-    });
+  const statusMap = new Map(
+    savedArticles.map((article) => [
+      article.articleId,
+      {
+        isRead: article.isRead,
+        isFavorite: article.isFavorite,
+      },
+    ]),
+  );
 
-    articlesWithStatus.push({
-  
+  return articles.map((article) => {
+    const status = statusMap.get(article.id);
+
+    return {
       ...article,
-
-      isRead: savedArticle ? savedArticle.isRead : false,
-
-      isFavorite: savedArticle ? savedArticle.isFavorite : false,
-    });
-  }
-
-  return articlesWithStatus;
+      isRead: status ? status.isRead : false,
+      isFavorite: status ? status.isFavorite : false,
+    };
+  });
 };
  

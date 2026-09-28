@@ -78,8 +78,6 @@ The application allows users to create an account, log in securely, set their ne
 ---
 
 # Project Structure
-
-```text
 news-aggregator-api/
 │
 ├── src/

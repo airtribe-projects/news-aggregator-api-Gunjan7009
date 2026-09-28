@@ -2,12 +2,12 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    businessId: {
-      type: String,
-      required: true,
-      unique: true,
-      immutable: true,
-    },
+    // businessId: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    //   immutable: true,
+    // },
     name: {
       type: String,
       required: true,

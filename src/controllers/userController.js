@@ -1,5 +1,5 @@
 const express = require("express");
-const { randomBytes } = require("crypto");
+// const { randomBytes } = require("crypto");
 const bcrypt = require("bcryptjs");
 const JWT = require("jsonwebtoken");
 const User = require("../models/User")
@@ -39,7 +39,7 @@ exports.signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = {
-            businessId: randomBytes(6).toString("base64url"),
+            // businessId: randomBytes(6).toString("base64url"),
             name,
             email,
             password: hashedPassword,
